@@ -57,15 +57,15 @@ __global__ void mandelbrotKernel(double xmin, double ymin, double dx, double dy,
 
 int main(int argc, char* argv[]) {
     if (argc != 8) {
+        printf("Invalid usage!\n");
         printf("Usage:   %s <xmin> <xmax> <ymin> <ymax> <maxiter> <xres> <out.ppm>\n", argv[0]);
-        printf("test");
         printf("Example: %s 0.27085 0.27100 0.004640 0.004810 1000 1024 pic.ppm\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    time_t start, end;
+    struct timespec start, end;
 
-    time(&start);
+    timespec_get(&start, TIME_UTC);
 
     const double xmin = atof(argv[1]);
     const double xmax = atof(argv[2]);
@@ -97,8 +97,9 @@ int main(int argc, char* argv[]) {
     fclose(fp);
     cudaFree(result);
 
-    time(&end);
-    double time_taken = double(end - start);
+    timespec_get(&end, TIME_UTC);
+
+    double time_taken = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     
     printf("Generating Cuda Mandelbrot took: %.5f s", time_taken);
 
